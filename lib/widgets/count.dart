@@ -13,13 +13,14 @@ class Count extends StatefulWidget {
   final int productPrice;
   final int productQuantity;
 
-  const Count(
-      {super.key,
-      required this.productName,
-      required this.productImage,
-      required this.productId,
-      required this.productPrice,
-      required this.productQuantity});
+  const Count({
+    super.key,
+    required this.productName,
+    required this.productImage,
+    required this.productId,
+    required this.productPrice,
+    required this.productQuantity,
+  });
 
   @override
   State<Count> createState() => _CountState();
@@ -58,6 +59,7 @@ class _CountState extends State<Count> {
         Provider.of<ReviewCartProvider>(context);
     getAddAndQuantity();
     return Container(
+      height: 35,
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
       decoration: BoxDecoration(
         border: Border.all(width: 1, color: textColorSecondary),
@@ -71,7 +73,7 @@ class _CountState extends State<Count> {
                     onTap: () {
                       if (count > 1) {
                         setState(() {
-                          count++;
+                          count--;
                         });
                         reviewCartProvider.updateReviewCartData(
                           cartId: widget.productId,
@@ -144,7 +146,7 @@ class _CountState extends State<Count> {
                   );
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
                   child: Text(
                     'ADD',
                     style: GoogleFonts.poppins(

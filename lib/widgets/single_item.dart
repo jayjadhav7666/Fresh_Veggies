@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
 import 'package:fresh_veggies/providers/review_cart_provider.dart';
 import 'package:fresh_veggies/utils/utils.dart';
+import 'package:fresh_veggies/widgets/count.dart';
+
+import 'package:fresh_veggies/widgets/weight_sdr.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +14,7 @@ class SingleItem extends StatefulWidget {
   final String productImage;
   final String productName;
   final int productPrice;
+  final bool isFavourite;
   final int productQuantity;
   final VoidCallback? onDelete;
   const SingleItem(
@@ -21,6 +25,7 @@ class SingleItem extends StatefulWidget {
       required this.productPrice,
       required this.productId,
       required this.productQuantity,
+      this.isFavourite = false,
       this.onDelete});
 
   @override
@@ -33,7 +38,7 @@ class _SingleItemState extends State<SingleItem> {
   @override
   void initState() {
     super.initState();
-    count = widget.productQuantity; // Initialize count
+    count = widget.productQuantity;
   }
 
   @override
@@ -93,36 +98,7 @@ class _SingleItemState extends State<SingleItem> {
                                 color: textColor,
                               ),
                             )
-                          : Container(
-                              width: 85,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 5),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 1, color: textColorSecondary),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      '50 Gram',
-                                      style: GoogleFonts.manrope(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w600,
-                                        color: textColorSecondary,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Icon(
-                                      Icons.arrow_drop_down,
-                                      size: 17,
-                                      color: primaryColor,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                          :   WeightDropdown(),
                     ],
                   ),
                 ),
@@ -132,98 +108,88 @@ class _SingleItemState extends State<SingleItem> {
                       children: [
                         InkWell(
                           onTap: widget.onDelete,
-                          child: Icon(Icons.delete, size: 25),
+                          child: Icon(
+                            Icons.delete,
+                            size: 25,
+                            color: textColor,
+                          ),
                         ),
                         const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            border:
-                                Border.all(width: 1, color: textColorSecondary),
-                          ),
-                          child: Center(
-                            child: Row(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    if (count != null && count! > 1) {
-                                      setState(() {
-                                        count = count! - 1;
-                                      });
-                                      reviewCartProvider.updateReviewCartData(
-                                        cartId: widget.productId,
-                                        cartName: widget.productName,
-                                        cartImage: widget.productImage,
-                                        cartPrice: widget.productPrice,
-                                        cartQuantity: count!,
-                                      );
-                                    } else {
-                                      Utils.snackBar(
-                                          'You reached the minimum limit',
-                                          context);
-                                    }
-                                  },
-                                  child: Icon(Icons.remove,
-                                      size: 17, color: primaryColor),
+                        (widget.isFavourite == false)
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(
+                                      width: 1, color: textColorSecondary),
                                 ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  '$count',
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: primaryColor,
+                                child: Center(
+                                  child: Row(
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          if (count != null && count! > 1) {
+                                            setState(() {
+                                              count = count! - 1;
+                                            });
+                                            reviewCartProvider
+                                                .updateReviewCartData(
+                                              cartId: widget.productId,
+                                              cartName: widget.productName,
+                                              cartImage: widget.productImage,
+                                              cartPrice: widget.productPrice,
+                                              cartQuantity: count!,
+                                            );
+                                          } else {
+                                            Utils.snackBar(
+                                                'You reached the minimum limit',
+                                                context);
+                                          }
+                                        },
+                                        child: Icon(Icons.remove,
+                                            size: 17, color: primaryColor),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        '$count',
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: primaryColor,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            count = (count ?? 0) + 1;
+                                          });
+                                          reviewCartProvider
+                                              .updateReviewCartData(
+                                            cartId: widget.productId,
+                                            cartName: widget.productName,
+                                            cartImage: widget.productImage,
+                                            cartPrice: widget.productPrice,
+                                            cartQuantity: count!,
+                                          );
+                                        },
+                                        child: Icon(Icons.add,
+                                            size: 17, color: primaryColor),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(width: 5),
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      count = (count ?? 0) + 1;
-                                    });
-                                    reviewCartProvider.updateReviewCartData(
-                                      cartId: widget.productId,
-                                      cartName: widget.productName,
-                                      cartImage: widget.productImage,
-                                      cartPrice: widget.productPrice,
-                                      cartQuantity: count!,
-                                    );
-                                  },
-                                  child: Icon(Icons.add,
-                                      size: 17, color: primaryColor),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                              )
+                            : Container(),
                       ],
                     )
-                  : Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 7),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(width: 1, color: textColorSecondary),
-                      ),
-                      child: Center(
-                        child: Row(
-                          children: [
-                            Icon(Icons.add, size: 17, color: primaryColor),
-                            const SizedBox(width: 5),
-                            Text(
-                              'ADD',
-                              style: GoogleFonts.manrope(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  : Count(
+                      productName: widget.productName,
+                      productImage: widget.productImage,
+                      productId: widget.productId,
+                      productPrice: widget.productPrice,
+                      productQuantity: widget.productQuantity),
             ],
           ),
         ),

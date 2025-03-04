@@ -18,6 +18,7 @@ class ProductProvider with ChangeNotifier {
         productImage: element.get("productImage"),
         description: element.get('description'),
         productPrice: element.get('productPrice'),
+        productQuantity: 1,
       );
       newList.add(productModel);
     }
@@ -45,6 +46,7 @@ class ProductProvider with ChangeNotifier {
         productImage: element.get("productImage"),
         description: element.get('description'),
         productPrice: element.get('productPrice'),
+        productQuantity: 1,
       );
       newList.add(productModel);
     }
@@ -72,6 +74,7 @@ class ProductProvider with ChangeNotifier {
         productImage: element.get("productImage"),
         description: element.get('description'),
         productPrice: element.get('productPrice'),
+        productQuantity: 1,
       );
       newList.add(productModel);
     }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
-import 'package:fresh_veggies/count.dart';
+import 'package:fresh_veggies/widgets/count.dart';
+import 'package:fresh_veggies/widgets/weight_sdr.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 
 class SingleProduct extends StatefulWidget {
@@ -25,8 +27,8 @@ class _SingleProductState extends State<SingleProduct> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 220,
-      width: 190,
+      height: 240,
+      width: 200,
       padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10, right: 7),
       margin: const EdgeInsets.only(right: 10),
       decoration: BoxDecoration(
@@ -47,7 +49,7 @@ class _SingleProductState extends State<SingleProduct> {
                 tag: widget.productImage,
                 child: Image.network(
                   widget.productImage,
-                  height: 100,
+                  height: 120,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -81,38 +83,7 @@ class _SingleProductState extends State<SingleProduct> {
                 ),
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 5,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: textColorSecondary),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Center(
-                        child: Row(
-                          children: [
-                            Text(
-                              '50 Gram',
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: textColorSecondary,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Icon(
-                              Icons.arrow_drop_down,
-                              size: 17,
-                              color: primaryColor,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    WeightDropdown(),
                     const SizedBox(
                       width: 8,
                     ),

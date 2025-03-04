@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
 import 'package:fresh_veggies/providers/product_provider.dart';
+import 'package:fresh_veggies/providers/user_provider.dart';
 import 'package:fresh_veggies/screens/home/drawer_side.dart';
 import 'package:fresh_veggies/screens/home/single_product.dart';
 import 'package:fresh_veggies/screens/product_overview/product_overview.dart';
+import 'package:fresh_veggies/screens/review_cart/review_cart.dart';
 import 'package:fresh_veggies/screens/search/search_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -82,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           productName: herbsProduct.productName,
                           productPrice: herbsProduct.productPrice,
                           description: herbsProduct.description,
+                          productQuantity: herbsProduct.productQuantity,
                         ),
                       ),
                     );
@@ -156,12 +159,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => ProductOverview(
-                          productId: fruitsProduct.productId,
-                          productImage: fruitsProduct.productImage,
-                          productName: fruitsProduct.productName,
-                          productPrice: fruitsProduct.productPrice,
-                          description: fruitsProduct.description,
-                        ),
+                            productId: fruitsProduct.productId,
+                            productImage: fruitsProduct.productImage,
+                            productName: fruitsProduct.productName,
+                            productPrice: fruitsProduct.productPrice,
+                            description: fruitsProduct.description,
+                            productQuantity: fruitsProduct.productQuantity),
                       ),
                     );
                   },
@@ -242,6 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           productName: rootProduct.productName,
                           productPrice: rootProduct.productPrice,
                           description: rootProduct.description,
+                          productQuantity: rootProduct.productQuantity,
                         ),
                       ),
                     );
@@ -274,9 +278,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     ProductProvider productProvider = Provider.of<ProductProvider>(context);
+    UserProvider userProvider = Provider.of<UserProvider>(context);
+    userProvider.getUserData();
     return Scaffold(
       //drawer
-      drawer: DrawerSide(),
+      drawer: DrawerSide(userProvider: userProvider,),
       backgroundColor: scaffoldBackgroundColor,
       //appbar
       appBar: __buildAppBar(productProvider),
@@ -366,7 +372,13 @@ class _HomeScreenState extends State<HomeScreen> {
             radius: 17,
             backgroundColor: scaffoldBackgroundColor,
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ReviewCart(),
+                  ),
+                );
+              },
               tooltip: 'Shop',
               icon: Icon(
                 Icons.shop,

@@ -1,6 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
+import 'package:fresh_veggies/providers/wistlist_provider.dart';
+import 'package:fresh_veggies/screens/review_cart/review_cart.dart';
+import 'package:fresh_veggies/widgets/count.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 enum SigninCharacter { fill, outline }
 
@@ -10,13 +16,17 @@ class ProductOverview extends StatefulWidget {
   final String productImage;
   final int productPrice;
   final String description;
-  const ProductOverview(
-      {super.key,
-      required this.productId,
-      required this.productName,
-      required this.productImage,
-      required this.productPrice,
-      required this.description});
+  final int productQuantity;
+
+  const ProductOverview({
+    super.key,
+    required this.productId,
+    required this.productName,
+    required this.productImage,
+    required this.productPrice,
+    required this.description,
+    required this.productQuantity,
+  });
 
   @override
   State<ProductOverview> createState() => _ProductOverviewState();
@@ -25,36 +35,60 @@ class ProductOverview extends StatefulWidget {
 class _ProductOverviewState extends State<ProductOverview> {
   SigninCharacter _character = SigninCharacter.fill;
 
+  bool isFavourite = false;
+
+  getFavouriteInfo() {
+    FirebaseFirestore.instance
+        .collection('WishList')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('YourWishList')
+        .doc(widget.productId)
+        .get()
+        .then((value) {
+      if (this.mounted) {
+        if (value.exists) {
+          setState(() {
+            isFavourite = value.get('isFavourite');
+          });
+        }
+      }
+    });
+  }
+
   Widget bottomNavigationBar(
       {required Color iconColor,
       required Color backgroundColor,
       required Color color,
       required String title,
-      required IconData iconData}) {
+      required IconData iconData,
+      required VoidCallback onTap}) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        color: backgroundColor,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              iconData,
-              size: 20,
-              color: iconColor,
-            ),
-            const SizedBox(
-              width: 7,
-            ),
-            Text(
-              title,
-              style: GoogleFonts.manrope(
-                color: color,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 15),
+          color: backgroundColor,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                iconData,
+                size: 25,
+                color: iconColor,
               ),
-            ),
-          ],
+              const SizedBox(
+                width: 7,
+              ),
+              Text(
+                title,
+                style: GoogleFonts.manrope(
+                  color: color,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -62,6 +96,8 @@ class _ProductOverviewState extends State<ProductOverview> {
 
   @override
   Widget build(BuildContext context) {
+    WishListProvider wishListProvider = Provider.of<WishListProvider>(context);
+    getFavouriteInfo();
     return Scaffold(
       bottomNavigationBar: Row(
         children: [
@@ -70,7 +106,25 @@ class _ProductOverviewState extends State<ProductOverview> {
             color: secondaryColor,
             title: 'Add To Wishlist',
             backgroundColor: textColor,
-            iconData: Icons.favorite_outline,
+            iconData:
+                isFavourite == false ? Icons.favorite_outline : Icons.favorite,
+            onTap: () {
+              setState(() {
+                isFavourite = !isFavourite;
+              });
+
+              if (isFavourite == true) {
+                wishListProvider.addWishListData(
+                  wishListId: widget.productId,
+                  wishListName: widget.productName,
+                  wishListImage: widget.productImage,
+                  wishListPrice: widget.productPrice,
+                  wishListQuantity: 2,
+                );
+              } else {
+                wishListProvider.delete(widget.productId);
+              }
+            },
           ),
           bottomNavigationBar(
             iconColor: secondaryColor,
@@ -78,6 +132,13 @@ class _ProductOverviewState extends State<ProductOverview> {
             title: 'Go To Cart',
             backgroundColor: primaryColor,
             iconData: Icons.shopping_bag_outlined,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ReviewCart(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -179,35 +240,43 @@ class _ProductOverviewState extends State<ProductOverview> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(width: 1, color: textColorSecondary),
-                    ),
-                    child: Center(
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.add,
-                            size: 17,
-                            color: primaryColor,
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'ADD',
-                            style: GoogleFonts.manrope(
-                              fontWeight: FontWeight.w500,
-                              color: primaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+
+                  Count(
+                    productName: widget.productName,
+                    productImage: widget.productImage,
+                    productId: widget.productId,
+                    productPrice: widget.productPrice,
+                    productQuantity: widget.productQuantity,
                   ),
+                  // Container(
+                  //   padding:
+                  //       const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
+                  //   decoration: BoxDecoration(
+                  //     borderRadius: BorderRadius.circular(30),
+                  //     border: Border.all(width: 1, color: textColorSecondary),
+                  //   ),
+                  //   child: Center(
+                  //     child: Row(
+                  //       children: [
+                  //         Icon(
+                  //           Icons.add,
+                  //           size: 17,
+                  //           color: primaryColor,
+                  //         ),
+                  //         const SizedBox(
+                  //           width: 5,
+                  //         ),
+                  //         Text(
+                  //           'ADD',
+                  //           style: GoogleFonts.manrope(
+                  //             fontWeight: FontWeight.w500,
+                  //             color: primaryColor,
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
               const SizedBox(

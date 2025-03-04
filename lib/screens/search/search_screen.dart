@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
 import 'package:fresh_veggies/model/product_model.dart';
+import 'package:fresh_veggies/screens/product_overview/product_overview.dart';
 import 'package:fresh_veggies/widgets/single_item.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -79,14 +80,30 @@ class _SearchScreenState extends State<SearchScreen> {
                     : Column(
                         children: filteredList.map(
                           (data) {
-                            return SingleItem(
-                              isBool: false,
-                              productImage: data.productImage,
-                              productName: data.productName,
-                              productPrice: data.productPrice,
-                              productId: data.productId,
-                              productQuantity: 1,
-                              onDelete: () {},
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProductOverview(
+                                        productId: data.productId,
+                                        productName: data.productName,
+                                        productImage: data.productImage,
+                                        productPrice: data.productPrice,
+                                        description: data.description,
+                                        productQuantity: data.productQuantity),
+                                  ),
+                                );
+                              },
+                              child: SingleItem(
+                                isBool: false,
+                                productImage: data.productImage,
+                                productName: data.productName,
+                                productPrice: data.productPrice,
+                                productId: data.productId,
+                                productQuantity: 1,
+                                onDelete: () {},
+                              ),
                             );
                           },
                         ).toList(),

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
+import 'package:fresh_veggies/providers/user_provider.dart';
 import 'package:fresh_veggies/screens/home/home_screen.dart';
 import 'package:fresh_veggies/screens/my_profile/my_profile.dart';
 import 'package:fresh_veggies/screens/review_cart/review_cart.dart';
+import 'package:fresh_veggies/screens/wishList.dart/wishlist_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DrawerSide extends StatefulWidget {
-  const DrawerSide({super.key});
+  final UserProvider userProvider;
+  const DrawerSide({super.key, required this.userProvider});
 
   @override
   State<DrawerSide> createState() => _DrawerSideState();
@@ -49,6 +52,7 @@ class _DrawerSideState extends State<DrawerSide> {
 
   @override
   Widget build(BuildContext context) {
+    var userData = widget.userProvider.getUserInfo;
     return Drawer(
       child: Column(
         children: [
@@ -71,42 +75,40 @@ class _DrawerSideState extends State<DrawerSide> {
                       radius: 40,
                       backgroundColor: scaffoldBackgroundColor,
                       backgroundImage: NetworkImage(
-                        "https://newprofilepic.photo-cdn.net//assets/images/article/profile.jpg?90af0c8",
+                        userData.userImage ??
+                            "https://www.pngfind.com/pngs/m/467-4675403_png-file-blank-person-transparent-png.png",
                       ),
                     ),
                   ),
                   const SizedBox(width: 20),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Welcome Guest',
-                        style: GoogleFonts.manrope(
-                          color: secondaryColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
+                      SizedBox(
+                        width: 165,
+                        child: Text(
+                          userData.userName,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.manrope(
+                            color: secondaryColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
-                      GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(width: 1, color: secondaryColor),
+                      SizedBox(
+                        width: 165,
+                        child: Text(
+                          userData.userEmail,
+                          style: GoogleFonts.manrope(
+                            color: secondaryColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
-                          child: Center(
-                            child: Text(
-                              "Login",
-                              style: GoogleFonts.manrope(
-                                color: secondaryColor,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -147,9 +149,12 @@ class _DrawerSideState extends State<DrawerSide> {
                     icon: Icons.person_outline,
                     title: 'My Profile',
                     onTap: () {
-                      Navigator.of(context).pushReplacement(
+                      Navigator.of(context).push(
                         MaterialPageRoute(
-                            builder: (context) => const MyProfile()),
+                          builder: (context) => MyProfile(
+                            userProvider: widget.userProvider,
+                          ),
+                        ),
                       );
                     },
                     index: 2,
@@ -169,7 +174,13 @@ class _DrawerSideState extends State<DrawerSide> {
                   listTile(
                     icon: Icons.favorite_outline,
                     title: 'Wishlist',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const WishListScreen(),
+                        ),
+                      );
+                    },
                     index: 5,
                   ),
                   listTile(

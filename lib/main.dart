@@ -6,6 +6,7 @@ import 'package:fresh_veggies/firebase_options.dart';
 import 'package:fresh_veggies/providers/product_provider.dart';
 import 'package:fresh_veggies/providers/review_cart_provider.dart';
 import 'package:fresh_veggies/providers/user_provider.dart';
+import 'package:fresh_veggies/providers/wistlist_provider.dart';
 import 'package:fresh_veggies/screens/home/home_screen.dart';
 import 'package:fresh_veggies/screens/splash_screen/splash_screen.dart';
 import 'package:provider/provider.dart';
@@ -33,6 +34,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<ReviewCartProvider>(
           create: (context) => ReviewCartProvider(),
+        ),
+        ChangeNotifierProvider<WishListProvider>(
+          create: (context) => WishListProvider(),
         ),
       ],
       child: MaterialApp(
