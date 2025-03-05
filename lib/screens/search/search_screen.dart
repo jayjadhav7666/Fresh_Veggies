@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
 import 'package:fresh_veggies/model/product_model.dart';
+import 'package:fresh_veggies/screens/home/home_screen.dart';
 import 'package:fresh_veggies/screens/product_overview/product_overview.dart';
 import 'package:fresh_veggies/widgets/single_item.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,13 +29,14 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     List<ProductModel> filteredList = searchItems(query);
+    log('search');
     return Scaffold(
       backgroundColor: scaffoldBackgroundColor,
       appBar: _buildAppBar(),
       body: widget.search.isEmpty
           ? Center(
-              child:
-                  CircularProgressIndicator()) // Show loading indicator if data is empty
+              child: CircularProgressIndicator(),
+            )
           : ListView(
               children: [
                 ListTile(
@@ -86,12 +90,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ProductOverview(
-                                        productId: data.productId,
-                                        productName: data.productName,
-                                        productImage: data.productImage,
-                                        productPrice: data.productPrice,
-                                        description: data.description,
-                                        productQuantity: data.productQuantity),
+                                      productModel: data,
+                                    ),
                                   ),
                                 );
                               },
@@ -101,7 +101,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 productName: data.productName,
                                 productPrice: data.productPrice,
                                 productId: data.productId,
-                                productQuantity: 1,
+                                productQuantity: data.productQuantity,
                                 onDelete: () {},
                               ),
                             );
@@ -127,6 +127,15 @@ class _SearchScreenState extends State<SearchScreen> {
           fontWeight: FontWeight.w700,
           color: secondaryColor,
         ),
+      ),
+      leading: BackButton(
+        onPressed: () {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => HomeScreen(),
+            ),
+          );
+        },
       ),
       actions: [
         Padding(

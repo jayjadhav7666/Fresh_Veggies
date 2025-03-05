@@ -5,7 +5,7 @@ import 'package:fresh_veggies/model/review_cart_model.dart';
 
 class ReviewCartProvider with ChangeNotifier {
   //add data in review list
-  void addReviewCartData({
+  Future addReviewCartData({
     required String cartId,
     required String cartName,
     required String cartImage,
@@ -25,10 +25,11 @@ class ReviewCartProvider with ChangeNotifier {
       'cartQuantity': cartQuantity,
       'isAdd': true,
     });
+    notifyListeners();
   }
 
 // update data in review list
-  void updateReviewCartData({
+  Future updateReviewCartData({
     required String cartId,
     required String cartName,
     required String cartImage,
@@ -48,11 +49,13 @@ class ReviewCartProvider with ChangeNotifier {
       'cartQuantity': cartQuantity,
       'isAdd': true,
     });
+    await getReviewCartData();
+    notifyListeners();
   }
 
 //get data in review list
   List<ReviewCartModel> reviewCartDataList = [];
-  void getReviewCartData() async {
+  Future getReviewCartData() async {
     List<ReviewCartModel> newList = [];
     QuerySnapshot reviewcartdata = await FirebaseFirestore.instance
         .collection('ReviewCart')
@@ -80,14 +83,17 @@ class ReviewCartProvider with ChangeNotifier {
   }
 
   //delete data in review list
-  void deleteReviewData(String cartId) async {
+  Future deleteReviewData(String cartId) async {
     await FirebaseFirestore.instance
         .collection('ReviewCart')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('YourReviwCart')
         .doc(cartId)
         .delete();
-
+    reviewCartDataList.removeWhere((element) => element.cartId == cartId);
+    getReviewCartData();
     notifyListeners();
   }
+
+
 }

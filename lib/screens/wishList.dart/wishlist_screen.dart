@@ -53,7 +53,7 @@ class _WishListScreenState extends State<WishListScreen> {
                   productPrice: data.productPrice,
                   productId: data.productId,
                   productQuantity: data.productQuantity,
-                  isFavourite:true,
+                  isFavourite: true,
                   onDelete: () {
                     showDialog(
                       context: context,

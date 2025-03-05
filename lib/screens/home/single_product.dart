@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
 import 'package:fresh_veggies/widgets/count.dart';
@@ -24,8 +28,33 @@ class SingleProduct extends StatefulWidget {
 }
 
 class _SingleProductState extends State<SingleProduct> {
+  int count = 0;
+  getAddAndQuantity() {
+    FirebaseFirestore.instance
+        .collection('ReviewCart')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('YourReviwCart')
+        .doc(widget.productId)
+        .get()
+        .then(
+          (value) => {
+            if (mounted)
+              {
+                if (value.exists)
+                  {
+                    setState(() {
+                      count = value.get("cartQuantity");
+                    })
+                  }
+              }
+          },
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // getAddAndQuantity();
+    log('single product');
     return Container(
       height: 240,
       width: 200,
@@ -92,7 +121,7 @@ class _SingleProductState extends State<SingleProduct> {
                       productName: widget.productName,
                       productImage: widget.productImage,
                       productPrice: widget.productPrice,
-                      productQuantity: 1,
+                      productQuantity: count,
                     ),
                   ],
                 ),

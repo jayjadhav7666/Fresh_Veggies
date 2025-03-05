@@ -17,35 +17,25 @@ class SingleItem extends StatefulWidget {
   final bool isFavourite;
   final int productQuantity;
   final VoidCallback? onDelete;
-  const SingleItem(
-      {super.key,
-      this.isBool = false,
-      required this.productImage,
-      required this.productName,
-      required this.productPrice,
-      required this.productId,
-      required this.productQuantity,
-      this.isFavourite = false,
-      this.onDelete});
+  const SingleItem({
+    super.key,
+    this.isBool = false,
+    required this.productImage,
+    required this.productName,
+    required this.productPrice,
+    required this.productId,
+    required this.productQuantity,
+    this.isFavourite = false,
+    this.onDelete,
+  });
 
   @override
   State<SingleItem> createState() => _SingleItemState();
 }
 
 class _SingleItemState extends State<SingleItem> {
-  int? count;
-
-  @override
-  void initState() {
-    super.initState();
-    count = widget.productQuantity;
-  }
-
   @override
   Widget build(BuildContext context) {
-    ReviewCartProvider reviewCartProvider =
-        Provider.of<ReviewCartProvider>(context);
-
     return Column(
       children: [
         Padding(
@@ -98,7 +88,7 @@ class _SingleItemState extends State<SingleItem> {
                                 color: textColor,
                               ),
                             )
-                          :   WeightDropdown(),
+                          : WeightDropdown(),
                     ],
                   ),
                 ),
@@ -116,70 +106,77 @@ class _SingleItemState extends State<SingleItem> {
                         ),
                         const SizedBox(height: 10),
                         (widget.isFavourite == false)
-                            ? Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(
-                                      width: 1, color: textColorSecondary),
-                                ),
-                                child: Center(
-                                  child: Row(
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          if (count != null && count! > 1) {
-                                            setState(() {
-                                              count = count! - 1;
-                                            });
-                                            reviewCartProvider
-                                                .updateReviewCartData(
-                                              cartId: widget.productId,
-                                              cartName: widget.productName,
-                                              cartImage: widget.productImage,
-                                              cartPrice: widget.productPrice,
-                                              cartQuantity: count!,
-                                            );
-                                          } else {
-                                            Utils.snackBar(
-                                                'You reached the minimum limit',
-                                                context);
-                                          }
-                                        },
-                                        child: Icon(Icons.remove,
-                                            size: 17, color: primaryColor),
+                            ? Consumer<ReviewCartProvider>(
+                                builder: (context, reviewCartProvider, child) {
+                                  int count = widget.productQuantity;
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      border: Border.all(
+                                          width: 1, color: textColorSecondary),
+                                    ),
+                                    child: Center(
+                                      child: Row(
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              if (count > 1) {
+                                                setState(() {
+                                                  count--;
+                                                });
+                                                reviewCartProvider
+                                                    .updateReviewCartData(
+                                                  cartId: widget.productId,
+                                                  cartName: widget.productName,
+                                                  cartImage:
+                                                      widget.productImage,
+                                                  cartPrice:
+                                                      widget.productPrice,
+                                                  cartQuantity: count,
+                                                );
+                                              } else {
+                                                Utils.snackBar(
+                                                    'You reached the minimum limit',
+                                                    context);
+                                              }
+                                            },
+                                            child: Icon(Icons.remove,
+                                                size: 17, color: primaryColor),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            '$count',
+                                            style: GoogleFonts.manrope(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w500,
+                                              color: primaryColor,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                count++;
+                                              });
+                                              reviewCartProvider
+                                                  .updateReviewCartData(
+                                                cartId: widget.productId,
+                                                cartName: widget.productName,
+                                                cartImage: widget.productImage,
+                                                cartPrice: widget.productPrice,
+                                                cartQuantity: count,
+                                              );
+                                            },
+                                            child: Icon(Icons.add,
+                                                size: 17, color: primaryColor),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(width: 5),
-                                      Text(
-                                        '$count',
-                                        style: GoogleFonts.manrope(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500,
-                                          color: primaryColor,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 5),
-                                      InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            count = (count ?? 0) + 1;
-                                          });
-                                          reviewCartProvider
-                                              .updateReviewCartData(
-                                            cartId: widget.productId,
-                                            cartName: widget.productName,
-                                            cartImage: widget.productImage,
-                                            cartPrice: widget.productPrice,
-                                            cartQuantity: count!,
-                                          );
-                                        },
-                                        child: Icon(Icons.add,
-                                            size: 17, color: primaryColor),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                  );
+                                },
                               )
                             : Container(),
                       ],
@@ -189,7 +186,8 @@ class _SingleItemState extends State<SingleItem> {
                       productImage: widget.productImage,
                       productId: widget.productId,
                       productPrice: widget.productPrice,
-                      productQuantity: widget.productQuantity),
+                      productQuantity: widget.productQuantity,
+                    ),
             ],
           ),
         ),

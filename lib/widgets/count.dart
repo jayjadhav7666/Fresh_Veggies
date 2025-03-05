@@ -48,73 +48,117 @@ class _CountState extends State<Count> {
                       isAdd = value.get("isAdd");
                     })
                   }
+                else
+                  {
+                    setState(() {
+                      isAdd = false;
+                      count = 1;
+                    })
+                  }
               }
           },
         );
   }
 
   @override
-  Widget build(BuildContext context) {
-    ReviewCartProvider reviewCartProvider =
-        Provider.of<ReviewCartProvider>(context);
+  void initState() {
+    super.initState();
     getAddAndQuantity();
-    return Container(
-      height: 35,
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-      decoration: BoxDecoration(
-        border: Border.all(width: 1, color: textColorSecondary),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: isAdd == true
-          ? Center(
-              child: Row(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      if (count > 1) {
-                        setState(() {
-                          count--;
-                        });
-                        reviewCartProvider.updateReviewCartData(
-                          cartId: widget.productId,
-                          cartName: widget.productName,
-                          cartImage: widget.productImage,
-                          cartPrice: widget.productPrice,
-                          cartQuantity: count,
-                        );
-                      } else {
-                        setState(() {
-                          isAdd = false;
-                        });
-                        reviewCartProvider.deleteReviewData(widget.productId);
-                      }
-                    },
-                    child: Icon(
-                      Icons.remove,
-                      size: 18,
-                      color: primaryColor,
-                    ),
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // getAddAndQuantity();
+    // ReviewCartProvider reviewCartProvider =
+    //     Provider.of<ReviewCartProvider>(context);
+    return Consumer<ReviewCartProvider>(
+      builder: (context, reviewCartProvider, child) {
+        getAddAndQuantity();
+        return Container(
+          height: 35,
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+          decoration: BoxDecoration(
+            border: Border.all(width: 1, color: textColorSecondary),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: isAdd == true
+              ? Center(
+                  child: Row(
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          if (count > 1) {
+                            setState(() {
+                              count--;
+                            });
+                            reviewCartProvider.updateReviewCartData(
+                              cartId: widget.productId,
+                              cartName: widget.productName,
+                              cartImage: widget.productImage,
+                              cartPrice: widget.productPrice,
+                              cartQuantity: count,
+                            );
+                          } else {
+                            setState(() {
+                              isAdd = false;
+                            });
+                            reviewCartProvider
+                                .deleteReviewData(widget.productId);
+
+                            getAddAndQuantity();
+                          }
+                        },
+                        child: Icon(
+                          Icons.remove,
+                          size: 18,
+                          color: primaryColor,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        '$count',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          if (count < 6) {
+                            setState(() {
+                              count++;
+                            });
+                            reviewCartProvider.updateReviewCartData(
+                              cartId: widget.productId,
+                              cartName: widget.productName,
+                              cartImage: widget.productImage,
+                              cartPrice: widget.productPrice,
+                              cartQuantity: count,
+                            );
+                          }
+                        },
+                        child: Icon(
+                          Icons.add,
+                          size: 18,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    '$count',
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: primaryColor,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  InkWell(
+                )
+              : Center(
+                  child: InkWell(
                     onTap: () {
                       setState(() {
-                        count++;
+                        isAdd = true;
                       });
-                      reviewCartProvider.updateReviewCartData(
+                      reviewCartProvider.addReviewCartData(
                         cartId: widget.productId,
                         cartName: widget.productName,
                         cartImage: widget.productImage,
@@ -122,42 +166,21 @@ class _CountState extends State<Count> {
                         cartQuantity: count,
                       );
                     },
-                    child: Icon(
-                      Icons.add,
-                      size: 18,
-                      color: primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : Center(
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    isAdd = true;
-                  });
-                  reviewCartProvider.addReviewCartData(
-                    cartId: widget.productId,
-                    cartName: widget.productName,
-                    cartImage: widget.productImage,
-                    cartPrice: widget.productPrice,
-                    cartQuantity: count,
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  child: Text(
-                    'ADD',
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: primaryColor,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      child: Text(
+                        'ADD',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
+        );
+      },
     );
   }
 }

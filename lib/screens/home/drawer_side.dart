@@ -6,10 +6,12 @@ import 'package:fresh_veggies/screens/my_profile/my_profile.dart';
 import 'package:fresh_veggies/screens/review_cart/review_cart.dart';
 import 'package:fresh_veggies/screens/wishList.dart/wishlist_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class DrawerSide extends StatefulWidget {
-  final UserProvider userProvider;
-  const DrawerSide({super.key, required this.userProvider});
+  const DrawerSide({
+    super.key,
+  });
 
   @override
   State<DrawerSide> createState() => _DrawerSideState();
@@ -52,12 +54,12 @@ class _DrawerSideState extends State<DrawerSide> {
 
   @override
   Widget build(BuildContext context) {
-    var userData = widget.userProvider.getUserInfo;
     return Drawer(
       child: Column(
         children: [
           // Drawer Header
           Container(
+            height: 235,
             width: double.infinity,
             color:
                 Colors.green[500], // Ensure the color is green above the header
@@ -65,53 +67,55 @@ class _DrawerSideState extends State<DrawerSide> {
               decoration: BoxDecoration(
                 color: Colors.green[500], // Set DrawerHeader background color
               ),
-              child: Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
                     radius: 43,
                     backgroundColor: scaffoldBackgroundColor,
-                    child: CircleAvatar(
-                      radius: 40,
-                      backgroundColor: scaffoldBackgroundColor,
-                      backgroundImage: NetworkImage(
-                        userData.userImage ??
-                            "https://www.pngfind.com/pngs/m/467-4675403_png-file-blank-person-transparent-png.png",
-                      ),
+                    child: Consumer<UserProvider>(
+                      builder: (context, userProvider, child) {
+                        return CircleAvatar(
+                          radius: 40,
+                          backgroundColor: scaffoldBackgroundColor,
+                          backgroundImage: NetworkImage(
+                            userProvider.getUserInfo.userImage ??
+                                "https://www.pngfind.com/pngs/m/467-4675403_png-file-blank-person-transparent-png.png",
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  const SizedBox(width: 20),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: 165,
-                        child: Text(
-                          userData.userName,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.manrope(
-                            color: secondaryColor,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
-                          ),
+                  const SizedBox(height: 20),
+                  Consumer<UserProvider>(
+                    builder: (context, userProvider, child) {
+                      return Text(
+                        userProvider.getUserInfo.userName,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.manrope(
+                          color: secondaryColor,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: 165,
-                        child: Text(
-                          userData.userEmail,
-                          style: GoogleFonts.manrope(
-                            color: secondaryColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 5),
+                  Consumer<UserProvider>(
+                    builder: (context, userProvider, child) {
+                      return Text(
+                        userProvider.getUserInfo.userEmail,
+                        style: GoogleFonts.manrope(
+                          color: secondaryColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ),
-                    ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -151,9 +155,7 @@ class _DrawerSideState extends State<DrawerSide> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => MyProfile(
-                            userProvider: widget.userProvider,
-                          ),
+                          builder: (context) => MyProfile(),
                         ),
                       );
                     },

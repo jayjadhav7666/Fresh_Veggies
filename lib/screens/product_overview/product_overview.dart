@@ -1,9 +1,14 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
+import 'package:fresh_veggies/model/product_model.dart';
 import 'package:fresh_veggies/providers/wistlist_provider.dart';
+
 import 'package:fresh_veggies/screens/review_cart/review_cart.dart';
+
 import 'package:fresh_veggies/widgets/count.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -11,21 +16,11 @@ import 'package:provider/provider.dart';
 enum SigninCharacter { fill, outline }
 
 class ProductOverview extends StatefulWidget {
-  final String productId;
-  final String productName;
-  final String productImage;
-  final int productPrice;
-  final String description;
-  final int productQuantity;
+  final ProductModel productModel;
 
   const ProductOverview({
     super.key,
-    required this.productId,
-    required this.productName,
-    required this.productImage,
-    required this.productPrice,
-    required this.description,
-    required this.productQuantity,
+    required this.productModel,
   });
 
   @override
@@ -42,7 +37,7 @@ class _ProductOverviewState extends State<ProductOverview> {
         .collection('WishList')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('YourWishList')
-        .doc(widget.productId)
+        .doc(widget.productModel.productId)
         .get()
         .then((value) {
       if (this.mounted) {
@@ -97,6 +92,8 @@ class _ProductOverviewState extends State<ProductOverview> {
   @override
   Widget build(BuildContext context) {
     WishListProvider wishListProvider = Provider.of<WishListProvider>(context);
+
+    log('refresh');
     getFavouriteInfo();
     return Scaffold(
       bottomNavigationBar: Row(
@@ -115,14 +112,14 @@ class _ProductOverviewState extends State<ProductOverview> {
 
               if (isFavourite == true) {
                 wishListProvider.addWishListData(
-                  wishListId: widget.productId,
-                  wishListName: widget.productName,
-                  wishListImage: widget.productImage,
-                  wishListPrice: widget.productPrice,
+                  wishListId: widget.productModel.productId,
+                  wishListName: widget.productModel.productName,
+                  wishListImage: widget.productModel.productImage,
+                  wishListPrice: widget.productModel.productPrice,
                   wishListQuantity: 2,
                 );
               } else {
-                wishListProvider.delete(widget.productId);
+                wishListProvider.delete(widget.productModel.productId);
               }
             },
           ),
@@ -132,12 +129,13 @@ class _ProductOverviewState extends State<ProductOverview> {
             title: 'Go To Cart',
             backgroundColor: primaryColor,
             iconData: Icons.shopping_bag_outlined,
-            onTap: () {
-              Navigator.of(context).push(
+            onTap: () async {
+             Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ReviewCart(),
                 ),
               );
+             
             },
           ),
         ],
@@ -153,6 +151,7 @@ class _ProductOverviewState extends State<ProductOverview> {
             fontWeight: FontWeight.w700,
           ),
         ),
+        leading: BackButton(),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -167,9 +166,9 @@ class _ProductOverviewState extends State<ProductOverview> {
                 height: 20,
               ),
               Hero(
-                tag: widget.productName,
+                tag: widget.productModel.productName,
                 child: Text(
-                  widget.productName,
+                  widget.productModel.productName,
                   style: GoogleFonts.manrope(
                     color: textColor,
                     fontSize: 18,
@@ -181,7 +180,7 @@ class _ProductOverviewState extends State<ProductOverview> {
                 height: 5,
               ),
               Text(
-                "\$${widget.productPrice}",
+                "\$${widget.productModel.productPrice}",
                 style: GoogleFonts.manrope(
                   color: Colors.green[700],
                   fontSize: 15,
@@ -194,7 +193,7 @@ class _ProductOverviewState extends State<ProductOverview> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Image.network(
-                  widget.productImage,
+                  widget.productModel.productImage,
                 ),
               ),
               Text(
@@ -240,43 +239,13 @@ class _ProductOverviewState extends State<ProductOverview> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-
                   Count(
-                    productName: widget.productName,
-                    productImage: widget.productImage,
-                    productId: widget.productId,
-                    productPrice: widget.productPrice,
-                    productQuantity: widget.productQuantity,
+                    productName: widget.productModel.productName,
+                    productImage: widget.productModel.productImage,
+                    productId: widget.productModel.productId,
+                    productPrice: widget.productModel.productPrice,
+                    productQuantity: widget.productModel.productQuantity,
                   ),
-                  // Container(
-                  //   padding:
-                  //       const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
-                  //   decoration: BoxDecoration(
-                  //     borderRadius: BorderRadius.circular(30),
-                  //     border: Border.all(width: 1, color: textColorSecondary),
-                  //   ),
-                  //   child: Center(
-                  //     child: Row(
-                  //       children: [
-                  //         Icon(
-                  //           Icons.add,
-                  //           size: 17,
-                  //           color: primaryColor,
-                  //         ),
-                  //         const SizedBox(
-                  //           width: 5,
-                  //         ),
-                  //         Text(
-                  //           'ADD',
-                  //           style: GoogleFonts.manrope(
-                  //             fontWeight: FontWeight.w500,
-                  //             color: primaryColor,
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
               const SizedBox(
@@ -294,7 +263,7 @@ class _ProductOverviewState extends State<ProductOverview> {
                 height: 12,
               ),
               Text(
-                widget.description,
+                widget.productModel.description,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,

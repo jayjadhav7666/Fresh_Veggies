@@ -10,16 +10,18 @@ import 'package:fresh_veggies/providers/wistlist_provider.dart';
 import 'package:fresh_veggies/screens/home/home_screen.dart';
 import 'package:fresh_veggies/screens/splash_screen/splash_screen.dart';
 import 'package:provider/provider.dart';
-
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp( const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  
   const MyApp({super.key});
 
   @override
@@ -44,7 +46,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           scaffoldBackgroundColor: scaffoldBackgroundColor,
           primaryColor: primaryColor,
-        ),
+        ), navigatorObservers: [routeObserver],
         debugShowCheckedModeBanner: false,
         home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),

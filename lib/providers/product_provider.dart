@@ -18,6 +18,7 @@ class ProductProvider with ChangeNotifier {
         productImage: element.get("productImage"),
         description: element.get('description'),
         productPrice: element.get('productPrice'),
+        productUnit: element.get('productUnit'),
         productQuantity: 1,
       );
       newList.add(productModel);
@@ -46,6 +47,7 @@ class ProductProvider with ChangeNotifier {
         productImage: element.get("productImage"),
         description: element.get('description'),
         productPrice: element.get('productPrice'),
+        productUnit: element.get('productUnit'),
         productQuantity: 1,
       );
       newList.add(productModel);
@@ -74,6 +76,7 @@ class ProductProvider with ChangeNotifier {
         productImage: element.get("productImage"),
         description: element.get('description'),
         productPrice: element.get('productPrice'),
+        productUnit: element.get('productUnit'),
         productQuantity: 1,
       );
       newList.add(productModel);
@@ -99,4 +102,5 @@ class ProductProvider with ChangeNotifier {
   List<ProductModel> get getSearchList {
     return search;
   }
+
 }

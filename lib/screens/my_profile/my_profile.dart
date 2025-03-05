@@ -11,10 +11,12 @@ import 'package:fresh_veggies/screens/authetication/sign_in/signIn_page.dart';
 import 'package:fresh_veggies/utils/utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class MyProfile extends StatefulWidget {
-  final UserProvider userProvider;
-  const MyProfile({super.key, required this.userProvider});
+  const MyProfile({
+    super.key,
+  });
 
   @override
   State<MyProfile> createState() => _MyProfileState();
@@ -57,13 +59,11 @@ class _MyProfileState extends State<MyProfile> {
 
   @override
   Widget build(BuildContext context) {
-    var userData = widget.userProvider.getUserInfo;
+    UserProvider userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       backgroundColor: primaryColor,
       //drawer
-      drawer: DrawerSide(
-        userProvider: widget.userProvider,
-      ),
+      drawer: DrawerSide(),
       //appbar
       appBar: _buildAppBar(),
       body: Stack(
@@ -106,39 +106,49 @@ class _MyProfileState extends State<MyProfile> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      SizedBox(
-                                        width: 180,
-                                        child: Text(
-                                          userData.userName,
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                            color: textColor,
+                                      Consumer<UserProvider>(builder: (context,
+                                          userProvider, Widget? child) {
+                                        return SizedBox(
+                                          width: 180,
+                                          child: Text(
+                                            userProvider.getUserInfo.userName,
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.manrope(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: textColor,
+                                            ),
                                           ),
-                                        ),
-                                      ),
+                                        );
+                                      }),
                                       const SizedBox(
                                         height: 8,
                                       ),
-                                      SizedBox(
-                                        width: 180,
-                                        child: Text(
-                                          userData.userEmail,
-                                          overflow: TextOverflow.ellipsis,
-                                          // maxLines: 1,
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w500,
-                                            color: textColor,
-                                          ),
-                                        ),
+                                      Consumer<UserProvider>(
+                                        builder:
+                                            (context, userProvider, child) {
+                                          return SizedBox(
+                                            width: 180,
+                                            child: Text(
+                                              userProvider
+                                                  .getUserInfo.userEmail,
+                                              overflow: TextOverflow.ellipsis,
+                                              // maxLines: 1,
+                                              style: GoogleFonts.manrope(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w500,
+                                                color: textColor,
+                                              ),
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      _showEditBottomSheet(context);
+                                      _showEditBottomSheet(
+                                          context, userProvider);
                                     },
                                     child: Container(
                                       height: 40,
@@ -199,12 +209,16 @@ class _MyProfileState extends State<MyProfile> {
             child: CircleAvatar(
               radius: 45,
               backgroundColor: primaryColor,
-              child: CircleAvatar(
-                radius: 40,
-                backgroundImage: NetworkImage(
-                  userData.userImage ??
-                      "https://www.pngfind.com/pngs/m/467-4675403_png-file-blank-person-transparent-png.png",
-                ),
+              child: Consumer<UserProvider>(
+                builder: (context, userProvider, child) {
+                  return CircleAvatar(
+                    radius: 40,
+                    backgroundImage: NetworkImage(
+                      userProvider.getUserInfo.userImage ??
+                          "https://www.pngfind.com/pngs/m/467-4675403_png-file-blank-person-transparent-png.png",
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -230,11 +244,11 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  void _showEditBottomSheet(BuildContext context) {
+  void _showEditBottomSheet(BuildContext context, UserProvider userProvider) {
     TextEditingController nameController =
-        TextEditingController(text: widget.userProvider.getUserInfo.userName);
+        TextEditingController(text: userProvider.getUserInfo.userName);
     TextEditingController emailController =
-        TextEditingController(text: widget.userProvider.getUserInfo.userEmail);
+        TextEditingController(text: userProvider.getUserInfo.userEmail);
 
     showModalBottomSheet(
       context: context,
@@ -279,8 +293,7 @@ class _MyProfileState extends State<MyProfile> {
                               backgroundImage: selectedImage != null
                                   ? FileImage(File(selectedImage!.path))
                                   : NetworkImage(
-                                      widget.userProvider.getUserInfo
-                                              .userImage ??
+                                      userProvider.getUserInfo.userImage ??
                                           "https://www.pngfind.com/pngs/m/467-4675403_png-file-blank-person-transparent-png.png",
                                     ) as ImageProvider,
                             ),
@@ -325,11 +338,17 @@ class _MyProfileState extends State<MyProfile> {
                     backgroundColor: primaryColor,
                   ),
                   onPressed: () {
-                    widget.userProvider.updateUserData(
+                    String userImage;
+                    if (selectedImage != null) {
+                      userImage = url!;
+                    } else {
+                      userImage = userProvider.getUserInfo.userImage!;
+                    }
+                    userProvider.updateUserData(
                       currentUser: FirebaseAuth.instance.currentUser!,
                       userName: nameController.text.trim(),
                       userEmail: emailController.text.trim(),
-                      userImage: url,
+                      userImage: userImage,
                     );
                     setState(() {});
                     // Close the bottom sheet

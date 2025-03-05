@@ -32,12 +32,14 @@ class UserProvider with ChangeNotifier {
     await FirebaseFirestore.instance
         .collection('UserData')
         .doc(currentUser.uid)
-        .set({
+        .update({
       'userUid': currentUser.uid,
       'userName': userName,
       'userEmail': userEmail,
       'userImage': userImage,
     });
+    getUserData();
+    notifyListeners();
   }
 
 //get userData
