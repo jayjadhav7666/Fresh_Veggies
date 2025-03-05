@@ -271,13 +271,19 @@ class _MyProfileState extends State<MyProfile> {
                   children: [
                     CircleAvatar(
                       radius: 45,
-                      backgroundImage: selectedImage != null
-                          ? FileImage(File(selectedImage!.path))
-                          : widget.userProvider.getUserInfo.userImage != null
-                              ? NetworkImage(
-                                  widget.userProvider.getUserInfo.userImage!)
-                              : const NetworkImage(
-                                  "https://www.pngfind.com/pngs/m/467-4675403_png-file-blank-person-transparent-png.png"),
+                      backgroundColor: primaryColor,
+                      child: isLoading
+                          ? CircularProgressIndicator(color: primaryColor)
+                          : CircleAvatar(
+                              radius: 40,
+                              backgroundImage: selectedImage != null
+                                  ? FileImage(File(selectedImage!.path))
+                                  : NetworkImage(
+                                      widget.userProvider.getUserInfo
+                                              .userImage ??
+                                          "https://www.pngfind.com/pngs/m/467-4675403_png-file-blank-person-transparent-png.png",
+                                    ) as ImageProvider,
+                            ),
                     ),
                     CircleAvatar(
                       radius: 15,
@@ -325,7 +331,7 @@ class _MyProfileState extends State<MyProfile> {
                       userEmail: emailController.text.trim(),
                       userImage: url,
                     );
-
+                    setState(() {});
                     // Close the bottom sheet
                     Navigator.pop(context);
                   },
@@ -347,12 +353,22 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   void _pickImage() async {
-    selectedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+    setState(() {
+      isLoading = true;
+    });
+    selectedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (selectedImage != null) {
       String filePath =
           'profile_images/${DateTime.now().millisecondsSinceEpoch}.jpg';
       _uploadImage(filePath: filePath);
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
