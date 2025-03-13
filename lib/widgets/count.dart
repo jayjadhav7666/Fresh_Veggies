@@ -12,6 +12,7 @@ class Count extends StatefulWidget {
   final String productId;
   final int productPrice;
   final int productQuantity;
+  final String? productUnit;
 
   const Count({
     super.key,
@@ -19,7 +20,7 @@ class Count extends StatefulWidget {
     required this.productImage,
     required this.productId,
     required this.productPrice,
-    required this.productQuantity,
+    required this.productQuantity, this.productUnit,
   });
 
   @override
@@ -30,34 +31,20 @@ class _CountState extends State<Count> {
   int count = 1;
   bool isAdd = false;
 
-  getAddAndQuantity() {
-    FirebaseFirestore.instance
+  Future<void> getAddAndQuantity() async {
+    DocumentSnapshot value = await FirebaseFirestore.instance
         .collection('ReviewCart')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('YourReviwCart')
         .doc(widget.productId)
-        .get()
-        .then(
-          (value) => {
-            if (mounted)
-              {
-                if (value.exists)
-                  {
-                    setState(() {
-                      count = value.get("cartQuantity");
-                      isAdd = value.get("isAdd");
-                    })
-                  }
-                else
-                  {
-                    setState(() {
-                      isAdd = false;
-                      count = 1;
-                    })
-                  }
-              }
-          },
-        );
+        .get();
+
+    if (mounted) {
+      setState(() {
+        isAdd = value.exists ? value.get("isAdd") : false;
+        count = value.exists ? value.get("cartQuantity") : 1;
+      });
+    }
   }
 
   @override
@@ -76,10 +63,10 @@ class _CountState extends State<Count> {
         getAddAndQuantity();
         return Container(
           height: 35,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 8),
           decoration: BoxDecoration(
             border: Border.all(width: 1, color: textColorSecondary),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: isAdd == true
               ? Center(
@@ -164,6 +151,7 @@ class _CountState extends State<Count> {
                         cartImage: widget.productImage,
                         cartPrice: widget.productPrice,
                         cartQuantity: count,
+                        cartUnit:widget.productUnit,
                       );
                     },
                     child: Padding(

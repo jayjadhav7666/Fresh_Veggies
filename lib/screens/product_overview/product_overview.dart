@@ -1,14 +1,10 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
 import 'package:fresh_veggies/model/product_model.dart';
 import 'package:fresh_veggies/providers/wistlist_provider.dart';
-
 import 'package:fresh_veggies/screens/review_cart/review_cart.dart';
-
 import 'package:fresh_veggies/widgets/count.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -92,8 +88,6 @@ class _ProductOverviewState extends State<ProductOverview> {
   @override
   Widget build(BuildContext context) {
     WishListProvider wishListProvider = Provider.of<WishListProvider>(context);
-
-    log('refresh');
     getFavouriteInfo();
     return Scaffold(
       bottomNavigationBar: Row(
@@ -117,6 +111,7 @@ class _ProductOverviewState extends State<ProductOverview> {
                   wishListImage: widget.productModel.productImage,
                   wishListPrice: widget.productModel.productPrice,
                   wishListQuantity: 2,
+                  wishListUnit: widget.productModel.productUnit,
                 );
               } else {
                 wishListProvider.delete(widget.productModel.productId);
@@ -130,12 +125,11 @@ class _ProductOverviewState extends State<ProductOverview> {
             backgroundColor: primaryColor,
             iconData: Icons.shopping_bag_outlined,
             onTap: () async {
-             Navigator.of(context).push(
+              Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ReviewCart(),
                 ),
               );
-             
             },
           ),
         ],
@@ -165,22 +159,19 @@ class _ProductOverviewState extends State<ProductOverview> {
               const SizedBox(
                 height: 20,
               ),
-              Hero(
-                tag: widget.productModel.productName,
-                child: Text(
-                  widget.productModel.productName,
-                  style: GoogleFonts.manrope(
-                    color: textColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
+              Text(
+                widget.productModel.productName,
+                style: GoogleFonts.manrope(
+                  color: textColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(
                 height: 5,
               ),
               Text(
-                "\$${widget.productModel.productPrice}",
+                "${widget.productModel.productPrice}\$",
                 style: GoogleFonts.manrope(
                   color: Colors.green[700],
                   fontSize: 15,
@@ -192,8 +183,11 @@ class _ProductOverviewState extends State<ProductOverview> {
                 width: double.infinity,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Image.network(
-                  widget.productModel.productImage,
+                child: Hero(
+                  tag: widget.productModel.productImage,
+                  child: Image.network(
+                    widget.productModel.productImage,
+                  ),
                 ),
               ),
               Text(
@@ -232,7 +226,7 @@ class _ProductOverviewState extends State<ProductOverview> {
                     ],
                   ),
                   Text(
-                    "\$50",
+                    "50\$",
                     style: GoogleFonts.manrope(
                       color: textColorSecondary,
                       fontSize: 16,
@@ -245,6 +239,7 @@ class _ProductOverviewState extends State<ProductOverview> {
                     productId: widget.productModel.productId,
                     productPrice: widget.productModel.productPrice,
                     productQuantity: widget.productModel.productQuantity,
+                    productUnit: widget.productModel.productUnit[0],
                   ),
                 ],
               ),

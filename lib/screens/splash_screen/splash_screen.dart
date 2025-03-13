@@ -15,11 +15,13 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(
       Duration(seconds: 3),
       () {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => const OnboardingScreen(),
-          ),
-        );
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => const OnboardingScreen(),
+            ),
+          );
+        }
       },
     );
   }
@@ -27,20 +29,21 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          color: Color.fromRGBO(255, 255, 255, 1),
-          child: Center(
-            child: Column(
-              children: [
-                Image.asset(
-                  'assets/icons/freshveggies.png',
-                  height: 300,
-                  width: 400,
-                ),
-                Expanded(child: Image.asset('assets/images/splashscreen.png')),
-              ],
-            ),
+      body: Container(
+        color: Color.fromRGBO(255, 255, 255, 1),
+        child: Center(
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 30,
+              ),
+              Image.asset(
+                'assets/icons/freshveggies.png',
+                height: 300,
+                width: 400,
+              ),
+              Expanded(child: Image.asset('assets/images/splashscreen.png')),
+            ],
           ),
         ),
       ),

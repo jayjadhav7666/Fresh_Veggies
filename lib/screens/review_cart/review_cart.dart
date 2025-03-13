@@ -14,11 +14,31 @@ class ReviewCart extends StatefulWidget {
 }
 
 class _ReviewCartState extends State<ReviewCart> {
-  @override
-  Widget build(BuildContext context) {
+  bool isLoading = false;
+
+  fetchData() async {
+    setState(() {
+      isLoading = true;
+    });
     ReviewCartProvider reviewCartProvider =
         Provider.of<ReviewCartProvider>(context);
-    reviewCartProvider.getReviewCartData();
+    await reviewCartProvider.getReviewCartData();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // ReviewCartProvider reviewCartProvider =
+    // Provider.of<ReviewCartProvider>(context);
+    // reviewCartProvider.getReviewCartData();
     return Scaffold(
       bottomNavigationBar: SizedBox(
         height: 90,
@@ -37,17 +57,21 @@ class _ReviewCartState extends State<ReviewCart> {
                   fontSize: 16,
                 ),
               ),
-              subtitle: Text(
-                '\$190.0',
-                style: GoogleFonts.manrope(
-                  color: Colors.green[900],
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
+              subtitle: Consumer<ReviewCartProvider>(
+                builder: (context, reviewcartProvider, child) {
+                  return Text(
+                    "${reviewcartProvider.getTotalPrice()}\$",
+                    style: GoogleFonts.manrope(
+                      color: Colors.green[900],
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                  );
+                },
               ),
               trailing: Container(
                 width: 160,
-                height: 80,
+                height: 100,
                 margin: const EdgeInsets.all(10),
                 child: MaterialButton(
                   onPressed: () {},
@@ -55,7 +79,7 @@ class _ReviewCartState extends State<ReviewCart> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   color: primaryColor,
-                  height: 90,
+                  height: 100,
                   child: Center(
                     child: Text(
                       "Checkout",
@@ -88,6 +112,7 @@ class _ReviewCartState extends State<ReviewCart> {
       ),
       body: Consumer<ReviewCartProvider>(
         builder: (context, reviewCartProvider, child) {
+          reviewCartProvider.getReviewCartData();
           return ListView.builder(
             itemCount: reviewCartProvider.getreviewCartDataList.length,
             itemBuilder: (context, index) {
@@ -102,6 +127,7 @@ class _ReviewCartState extends State<ReviewCart> {
                   productPrice: data.cartPrice,
                   productId: data.cartId,
                   productQuantity: data.cartQuantity,
+                  cartUnit: data.cartUnit,
                   onDelete: () {
                     showDialog(
                       context: context,

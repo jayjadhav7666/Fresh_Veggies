@@ -27,6 +27,17 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    query = '';
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<ProductModel> filteredList = searchItems(query);
     log('search');
@@ -55,7 +66,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     },
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
@@ -84,7 +95,15 @@ class _SearchScreenState extends State<SearchScreen> {
                     : Column(
                         children: filteredList.map(
                           (data) {
-                            return GestureDetector(
+                            return SingleItem(
+                              isBool: false,
+                              productImage: data.productImage,
+                              productName: data.productName,
+                              productPrice: data.productPrice,
+                              productId: data.productId,
+                              productQuantity: data.productQuantity,
+                              productUnit: data.productUnit,
+                              onDelete: () {},
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -95,15 +114,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                   ),
                                 );
                               },
-                              child: SingleItem(
-                                isBool: false,
-                                productImage: data.productImage,
-                                productName: data.productName,
-                                productPrice: data.productPrice,
-                                productId: data.productId,
-                                productQuantity: data.productQuantity,
-                                onDelete: () {},
-                              ),
                             );
                           },
                         ).toList(),

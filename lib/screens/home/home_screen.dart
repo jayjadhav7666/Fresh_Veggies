@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fresh_veggies/colors.dart';
 import 'package:fresh_veggies/providers/product_provider.dart';
@@ -19,6 +20,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = false;
+  int _currentIndex = 0;
+  final CarouselSliderController carouselController =
+      CarouselSliderController();
   Widget _buildHerbsProduct(context, productProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   productImage: herbsProduct.productImage,
                   productName: herbsProduct.productName,
                   productPrice: herbsProduct.productPrice,
+                  productUnit: herbsProduct,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -149,6 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   productImage: fruitsProduct.productImage,
                   productName: fruitsProduct.productName,
                   productPrice: fruitsProduct.productPrice,
+                  productUnit: fruitsProduct,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -226,6 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   productImage: rootProduct.productImage,
                   productName: rootProduct.productName,
                   productPrice: rootProduct.productPrice,
+                  productUnit: rootProduct,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -251,6 +258,12 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchUserData();
     fetchData();
   }
+
+  List<String> images = [
+    'assets/images/banner/banner1.png',
+    'assets/images/banner/banner2.jpeg',
+    'assets/images/banner/banner3.jpeg',
+  ];
 
   void fetchUserData() async {
     UserProvider userProvider =
@@ -290,24 +303,80 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Container(
-                        height: 160,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.white,
-                          image: DecorationImage(
-                              image: AssetImage(
-                                  'assets/images/banner/banner1.png'),
-                              fit: BoxFit.cover),
-                          border: Border.all(
-                            width: 1,
-                            color: Color.fromRGBO(239, 239, 244, 1),
-                          ),
+                    CarouselSlider(
+                      items: images.map((imagePath) {
+                        return Builder(builder: (context) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: Container(
+                              height: 170,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.white,
+                                image: DecorationImage(
+                                  image: AssetImage(
+                                    imagePath,
+                                  ),
+                                  fit: BoxFit.cover,
+                                ),
+                                border: Border.all(
+                                  width: 1,
+                                  color: Color.fromRGBO(239, 239, 244, 1),
+                                ),
+                              ),
+                            ),
+                          );
+                        });
+                      }).toList(),
+                      carouselController: carouselController,
+                      options: CarouselOptions(
+                        enlargeCenterPage: true,
+                        autoPlay: true,
+                        height: 170,
+
+                        enableInfiniteScroll: false,
+                        autoPlayInterval: Duration(
+                          seconds: 3,
                         ),
+                        // reverse: true,
+                        scrollDirection: Axis.horizontal,
+                        viewportFraction: 1,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                        },
                       ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: images.asMap().entries.map((entry) {
+                        return GestureDetector(
+                          onTap: () {
+                            carouselController.animateToPage(entry.key);
+                            setState(() {
+                              _currentIndex = entry.key;
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                            ),
+                            width: _currentIndex == entry.key ? 18 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: _currentIndex == entry.key
+                                  ? primaryColor
+                                  : const Color.fromARGB(255, 211, 205, 205),
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
                     _buildHerbsProduct(context, productProvider),
                     _buildFreshFProduct(productProvider),
